@@ -1,0 +1,27 @@
+[package]
+name = "async-http1-lite"
+version = "0.1.0"
+authors = ["vkill <vkill.net@gmail.com>"]
+edition = "2018"
+description = "Asynchronous http1 stream."
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/bk-rs/async-http1-lite"
+homepage = "https://github.com/bk-rs/async-http1-lite"
+documentation = "https://docs.rs/async-http1-lite"
+keywords = []
+categories = ["asynchronous"]
+readme = "README.md"
+
+[dependencies]
+http = { version = "0.2", default-features = false, features = [] }
+futures-util = { version = "0.3", default-features = false, features = ["io"] }
+async-stream-packed = { version = "0.1", default-features = false, features = ["timeoutable"] }
+async-trait = { version = "0.1", default-features = false, features = [] }
+
+[dev-dependencies]
+futures-lite = { version = "0.1", default-features = false, features = [] }
+
+[workspace]
+members = [
+    "demos/smol",
+]
