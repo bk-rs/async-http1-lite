@@ -194,14 +194,15 @@ where
         let mut body = Vec::new();
         match body_framing {
             BodyFraming::Neither => {}
+            BodyFraming::ContentLength(n) if n == 0 => {}
             _ => loop {
                 match self.read_body().await? {
-                    DecoderBody::Completed(data) => {
-                        body.extend_from_slice(&data);
+                    DecoderBody::Completed(bytes) => {
+                        body.extend_from_slice(&bytes);
                         break;
                     }
-                    DecoderBody::Partial(data) => {
-                        body.extend_from_slice(&data);
+                    DecoderBody::Partial(bytes) => {
+                        body.extend_from_slice(&bytes);
                     }
                 }
             },
@@ -308,14 +309,15 @@ where
         let mut body = Vec::new();
         match body_framing {
             BodyFraming::Neither => {}
+            BodyFraming::ContentLength(n) if n == 0 => {}
             _ => loop {
                 match self.read_body().await? {
-                    DecoderBody::Completed(data) => {
-                        body.extend_from_slice(&data);
+                    DecoderBody::Completed(bytes) => {
+                        body.extend_from_slice(&bytes);
                         break;
                     }
-                    DecoderBody::Partial(data) => {
-                        body.extend_from_slice(&data);
+                    DecoderBody::Partial(bytes) => {
+                        body.extend_from_slice(&bytes);
                     }
                 }
             },
