@@ -69,7 +69,7 @@ where
     fn set_read_timeout(&mut self, dur: Duration) {
         self.read_timeout = dur;
     }
-    fn has_unparsed_bytes(&self) -> bool {
+    pub fn has_unparsed_bytes(&self) -> bool {
         self.offset_read > self.offset_parsed
     }
 
@@ -289,9 +289,6 @@ where
     fn set_read_timeout(&mut self, dur: Duration) {
         self.inner.set_read_timeout(dur)
     }
-    fn has_unparsed_bytes(&self) -> bool {
-        self.inner.has_unparsed_bytes()
-    }
 }
 
 //
@@ -344,8 +341,5 @@ where
 
     fn set_read_timeout(&mut self, dur: Duration) {
         self.inner.set_read_timeout(dur)
-    }
-    fn has_unparsed_bytes(&self) -> bool {
-        self.inner.has_unparsed_bytes()
     }
 }

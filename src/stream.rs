@@ -25,7 +25,6 @@ where
     async fn read_body(&mut self, stream: &mut S) -> io::Result<DecoderBody>;
 
     fn set_read_timeout(&mut self, dur: Duration);
-    fn has_unparsed_bytes(&self) -> bool;
 }
 
 #[async_trait]
@@ -85,20 +84,6 @@ where
 
     pub fn set_read_timeout(&mut self, dur: Duration) {
         self.decoder.set_read_timeout(dur)
-    }
-
-    //
-    pub fn get_ref(&self) -> &S {
-        &self.stream
-    }
-    pub fn get_mut(&mut self) -> &mut S {
-        &mut self.stream
-    }
-    pub fn into_inner(self) -> io::Result<S> {
-        if self.decoder.has_unparsed_bytes() {
-            return Err(io::Error::new(io::ErrorKind::Other, "has unparsed bytes"));
-        }
-        Ok(self.stream)
     }
 
     //
@@ -170,6 +155,19 @@ where
         Self {
             inner: Http1ClientStreamInner::new(stream, decoder, encoder),
         }
+    }
+
+    pub fn get_ref(&self) -> &S {
+        &self.inner.stream
+    }
+    pub fn get_mut(&mut self) -> &mut S {
+        &mut self.inner.stream
+    }
+    pub fn into_inner(self) -> io::Result<S> {
+        if self.decoder.has_unparsed_bytes() {
+            return Err(io::Error::new(io::ErrorKind::Other, "has unparsed bytes"));
+        }
+        Ok(self.inner.stream)
     }
 
     pub async fn write_request(&mut self, request: Request<Vec<u8>>) -> io::Result<()> {
@@ -255,6 +253,19 @@ where
         Self {
             inner: Http1ServerStreamInner::new(stream, decoder, encoder),
         }
+    }
+
+    pub fn get_ref(&self) -> &S {
+        &self.inner.stream
+    }
+    pub fn get_mut(&mut self) -> &mut S {
+        &mut self.inner.stream
+    }
+    pub fn into_inner(self) -> io::Result<S> {
+        if self.decoder.has_unparsed_bytes() {
+            return Err(io::Error::new(io::ErrorKind::Other, "has unparsed bytes"));
+        }
+        Ok(self.inner.stream)
     }
 
     pub async fn write_response(
