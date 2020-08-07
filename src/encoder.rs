@@ -246,7 +246,17 @@ where
 
         self.write_head0(stream).await?;
 
-        self.state = State::WriteBody(body_framing);
+        match body_framing {
+            BodyFraming::Neither => {
+                self.state = State::Idle;
+            }
+            BodyFraming::ContentLength(n) if n == 0 => {
+                self.state = State::Idle;
+            }
+            _ => {
+                self.state = State::WriteBody(body_framing);
+            }
+        }
 
         Ok(())
     }
@@ -313,7 +323,17 @@ where
 
         self.write_head0(stream).await?;
 
-        self.state = State::WriteBody(body_framing);
+        match body_framing {
+            BodyFraming::Neither => {
+                self.state = State::Idle;
+            }
+            BodyFraming::ContentLength(n) if n == 0 => {
+                self.state = State::Idle;
+            }
+            _ => {
+                self.state = State::WriteBody(body_framing);
+            }
+        }
 
         Ok(())
     }

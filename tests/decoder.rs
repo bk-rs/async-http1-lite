@@ -4,7 +4,9 @@ use futures_lite::future::block_on;
 use futures_util::io::Cursor;
 use http::{Method, Version};
 
-use async_http1_lite::{decoder::Http1RequestDecoder, stream::Http1StreamDecoder};
+use async_http1_lite::{
+    decoder::Http1RequestDecoder, message::body_framing::BodyFraming, stream::Http1StreamDecoder,
+};
 
 #[test]
 fn request_simple() -> io::Result<()> {
@@ -15,7 +17,7 @@ fn request_simple() -> io::Result<()> {
 
         let mut decoder = Http1RequestDecoder::new(1024, None);
 
-        let request = decoder.read_head(&mut stream).await?;
+        let (request, body_framing) = decoder.read_head(&mut stream).await?;
         assert_eq!(request.method(), Method::GET);
         assert_eq!(request.uri(), "/");
         assert_eq!(request.version(), Version::HTTP_11);
@@ -24,8 +26,9 @@ fn request_simple() -> io::Result<()> {
             request.headers().get("host").unwrap().to_str().unwrap(),
             "foo.com"
         );
+        assert_eq!(body_framing, BodyFraming::Neither);
 
-        let request = decoder.read_head(&mut stream).await?;
+        let (request, body_framing) = decoder.read_head(&mut stream).await?;
         assert_eq!(request.method(), Method::POST);
         assert_eq!(request.uri(), "/x");
         assert_eq!(request.version(), Version::HTTP_10);
@@ -34,6 +37,7 @@ fn request_simple() -> io::Result<()> {
             request.headers().get("host").unwrap().to_str().unwrap(),
             "bar.com"
         );
+        assert_eq!(body_framing, BodyFraming::Neither);
 
         let err = decoder.read_head(&mut stream).await.err().unwrap();
         assert_eq!(err.kind(), io::ErrorKind::UnexpectedEof);

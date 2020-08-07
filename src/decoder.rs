@@ -104,12 +104,15 @@ where
         self.offset_parsed = 0;
     }
 
-    async fn read_head0<S: AsyncRead + Unpin>(&mut self, stream: &mut S) -> io::Result<()> {
+    async fn read_head0<S: AsyncRead + Unpin>(
+        &mut self,
+        stream: &mut S,
+    ) -> io::Result<BodyFraming> {
         if self.state == State::Idle {
             self.rotate_offset();
         }
 
-        loop {
+        let body_framing = loop {
             self.read(stream).await?;
 
             let mut buf_reader = BufReader::new(&self.buf[self.offset_parsed..self.offset_read]);
@@ -135,7 +138,7 @@ where
                             if n == &0 {
                                 self.state = State::Idle;
                             } else {
-                                self.state = State::ReadBody(body_framing);
+                                self.state = State::ReadBody(body_framing.clone());
                             }
                         }
                         BodyFraming::Chunked => {
@@ -152,7 +155,7 @@ where
                         }
                     }
 
-                    break;
+                    break body_framing;
                 }
                 Ok(HeadParseOutput::Partial(n_parsed)) => {
                     self.offset_parsed += n_parsed;
@@ -164,9 +167,9 @@ where
                 }
                 Err(err) => return Err(err.into()),
             }
-        }
+        };
 
-        Ok(())
+        Ok(body_framing)
     }
 
     async fn read_body0<S: AsyncRead + Unpin>(
@@ -181,7 +184,10 @@ where
         }
 
         match &mut self.state {
-            State::Idle | State::ReadingHead => {
+            State::Idle => {
+                return Ok(DecoderBody::Completed(Vec::<u8>::new()));
+            }
+            State::ReadingHead => {
                 return Err(io::Error::new(
                     io::ErrorKind::Other,
                     "state should is ReadBody",
@@ -271,8 +277,8 @@ impl<S> Http1StreamDecoder<S, Request<()>> for Http1RequestDecoder
 where
     S: AsyncRead + Unpin + Send,
 {
-    async fn read_head(&mut self, stream: &mut S) -> io::Result<Request<()>> {
-        self.read_head0(stream).await?;
+    async fn read_head(&mut self, stream: &mut S) -> io::Result<(Request<()>, BodyFraming)> {
+        let body_framing = self.read_head0(stream).await?;
 
         let mut request = Request::new(());
         *request.method_mut() = self.inner.head_parser.method.to_owned();
@@ -280,7 +286,7 @@ where
         *request.version_mut() = self.inner.head_parser.http_version.to_owned();
         *request.headers_mut() = self.inner.head_parser.headers.to_owned();
 
-        Ok(request)
+        Ok((request, body_framing))
     }
     async fn read_body(&mut self, stream: &mut S) -> io::Result<DecoderBody> {
         self.read_body0(stream).await
@@ -323,8 +329,11 @@ impl<S> Http1StreamDecoder<S, (Response<()>, ReasonPhrase)> for Http1ResponseDec
 where
     S: AsyncRead + Unpin + Send,
 {
-    async fn read_head(&mut self, stream: &mut S) -> io::Result<(Response<()>, ReasonPhrase)> {
-        self.read_head0(stream).await?;
+    async fn read_head(
+        &mut self,
+        stream: &mut S,
+    ) -> io::Result<((Response<()>, ReasonPhrase), BodyFraming)> {
+        let body_framing = self.read_head0(stream).await?;
 
         let mut response = Response::new(());
         *response.version_mut() = self.inner.head_parser.http_version.to_owned();
@@ -333,7 +342,7 @@ where
 
         let reason_phrase = self.inner.head_parser.reason_phrase.to_owned();
 
-        Ok((response, reason_phrase))
+        Ok(((response, reason_phrase), body_framing))
     }
     async fn read_body(&mut self, stream: &mut S) -> io::Result<DecoderBody> {
         self.read_body0(stream).await

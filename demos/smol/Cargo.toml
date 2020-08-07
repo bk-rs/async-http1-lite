@@ -8,6 +8,10 @@ edition = "2018"
 name = "client"
 path = "src/client.rs"
 
+[[bin]]
+name = "client_with_http_proxy"
+path = "src/client_with_http_proxy.rs"
+
 [dependencies]
 async-http1-lite = { path = "../..", version = "0.1", features = [] }
 futures-lite = "0.1"

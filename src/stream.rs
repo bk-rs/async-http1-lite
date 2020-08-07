@@ -21,7 +21,7 @@ where
     S: AsyncRead + Unpin,
     H: Head,
 {
-    async fn read_head(&mut self, stream: &mut S) -> io::Result<H>;
+    async fn read_head(&mut self, stream: &mut S) -> io::Result<(H, BodyFraming)>;
     async fn read_body(&mut self, stream: &mut S) -> io::Result<DecoderBody>;
 
     fn set_read_timeout(&mut self, dur: Duration);
@@ -98,7 +98,7 @@ where
     }
 
     //
-    pub async fn read_head(&mut self) -> io::Result<DH> {
+    pub async fn read_head(&mut self) -> io::Result<(DH, BodyFraming)> {
         self.decoder.read_head(&mut self.stream).await
     }
     pub async fn read_body(&mut self) -> io::Result<DecoderBody> {
@@ -174,27 +174,37 @@ where
         let (parts, body) = request.into_parts();
         let head = Request::from_parts(parts, ());
 
-        self.write_head(head, BodyFraming::ContentLength(body.len()))
-            .await?;
-        self.write_body(EncoderBody::Completed(body)).await?;
+        let body_framing = BodyFraming::ContentLength(body.len());
+
+        self.write_head(head, body_framing.clone()).await?;
+        match body_framing {
+            BodyFraming::Neither => {}
+            BodyFraming::ContentLength(n) if n == 0 => {}
+            _ => {
+                self.write_body(EncoderBody::Completed(body)).await?;
+            }
+        }
 
         Ok(())
     }
 
     pub async fn read_response(&mut self) -> io::Result<(Response<Vec<u8>>, ReasonPhrase)> {
-        let (response, reason_phrase) = self.read_head().await?;
+        let ((response, reason_phrase), body_framing) = self.read_head().await?;
 
         let mut body = Vec::new();
-        loop {
-            match self.read_body().await? {
-                DecoderBody::Completed(data) => {
-                    body.extend_from_slice(&data);
-                    break;
+        match body_framing {
+            BodyFraming::Neither => {}
+            _ => loop {
+                match self.read_body().await? {
+                    DecoderBody::Completed(data) => {
+                        body.extend_from_slice(&data);
+                        break;
+                    }
+                    DecoderBody::Partial(data) => {
+                        body.extend_from_slice(&data);
+                    }
                 }
-                DecoderBody::Partial(data) => {
-                    body.extend_from_slice(&data);
-                }
-            }
+            },
         }
 
         let (parts, _) = response.into_parts();
@@ -276,30 +286,39 @@ where
         let (parts, body) = response.into_parts();
         let head = Response::from_parts(parts, ());
 
-        self.write_head(
-            (head, reason_phrase),
-            BodyFraming::ContentLength(body.len()),
-        )
-        .await?;
-        self.write_body(EncoderBody::Completed(body)).await?;
+        let body_framing = BodyFraming::ContentLength(body.len());
+
+        self.write_head((head, reason_phrase), body_framing.clone())
+            .await?;
+
+        match body_framing {
+            BodyFraming::Neither => {}
+            BodyFraming::ContentLength(n) if n == 0 => {}
+            _ => {
+                self.write_body(EncoderBody::Completed(body)).await?;
+            }
+        }
 
         Ok(())
     }
 
     pub async fn read_request(&mut self) -> io::Result<Request<Vec<u8>>> {
-        let request = self.read_head().await?;
+        let (request, body_framing) = self.read_head().await?;
 
         let mut body = Vec::new();
-        loop {
-            match self.read_body().await? {
-                DecoderBody::Completed(data) => {
-                    body.extend_from_slice(&data);
-                    break;
+        match body_framing {
+            BodyFraming::Neither => {}
+            _ => loop {
+                match self.read_body().await? {
+                    DecoderBody::Completed(data) => {
+                        body.extend_from_slice(&data);
+                        break;
+                    }
+                    DecoderBody::Partial(data) => {
+                        body.extend_from_slice(&data);
+                    }
                 }
-                DecoderBody::Partial(data) => {
-                    body.extend_from_slice(&data);
-                }
-            }
+            },
         }
 
         let (parts, _) = request.into_parts();
