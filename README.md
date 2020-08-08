@@ -7,6 +7,8 @@
 ### smol 
 
 * [client](demos/smol/src/client.rs)
+* [client_with_http_proxy](demos/smol/src/client_with_http_proxy.rs)
+* [client_with_tls](demos/smol/src/client_with_tls.rs)
 
 ## Dev
 
