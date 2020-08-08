@@ -2,9 +2,13 @@ use std::io;
 
 use futures_lite::future::block_on;
 use futures_util::io::Cursor;
-use futures_util::io::{AsyncReadExt, AsyncWriteExt};
+use futures_util::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 
 use async_http1_lite::stream::{Http1ClientStream, Http1ServerStream};
+
+struct MyStream<S>(S)
+where
+    S: AsyncRead + AsyncWrite;
 
 #[test]
 fn client_get_ref() -> io::Result<()> {
@@ -58,6 +62,15 @@ fn client_read_and_write() -> io::Result<()> {
 }
 
 #[test]
+fn client_asyncread_asyncwrite_bound() -> io::Result<()> {
+    let cursor = Cursor::new(b"".to_vec());
+    let stream = Http1ClientStream::new(cursor);
+    MyStream(stream);
+
+    Ok(())
+}
+
+#[test]
 fn server_get_ref() -> io::Result<()> {
     let cursor = Cursor::new(vec![]);
 
@@ -106,4 +119,13 @@ fn server_read_and_write() -> io::Result<()> {
 
         Ok(())
     })
+}
+
+#[test]
+fn server_asyncread_asyncwrite_bound() -> io::Result<()> {
+    let cursor = Cursor::new(b"".to_vec());
+    let stream = Http1ServerStream::new(cursor);
+    MyStream(stream);
+
+    Ok(())
 }
