@@ -1,6 +1,8 @@
 use std::io;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
+use std::pin::Pin;
+use std::task::{Context, Poll};
 use std::time::Duration;
 
 use async_trait::async_trait;
@@ -103,6 +105,44 @@ where
     }
     pub async fn read_body(&mut self) -> io::Result<DecoderBody> {
         self.decoder.read_body(&mut self.stream).await
+    }
+}
+
+impl<S, D, DH, E, EH> AsyncRead for Http1Stream<S, D, DH, E, EH>
+where
+    S: AsyncRead + AsyncWrite + Unpin,
+    D: Http1StreamDecoder<S, DH> + Unpin,
+    DH: Head + Unpin,
+    E: Http1StreamEncoder<S, EH> + Unpin,
+    EH: Head + Unpin,
+{
+    fn poll_read(
+        self: Pin<&mut Self>,
+        cx: &mut Context,
+        buf: &mut [u8],
+    ) -> Poll<io::Result<usize>> {
+        Pin::new(&mut self.get_mut().stream).poll_read(cx, buf)
+    }
+}
+
+impl<S, D, DH, E, EH> AsyncWrite for Http1Stream<S, D, DH, E, EH>
+where
+    S: AsyncRead + AsyncWrite + Unpin,
+    D: Http1StreamDecoder<S, DH> + Unpin,
+    DH: Head + Unpin,
+    E: Http1StreamEncoder<S, EH> + Unpin,
+    EH: Head + Unpin,
+{
+    fn poll_write(self: Pin<&mut Self>, cx: &mut Context, buf: &[u8]) -> Poll<io::Result<usize>> {
+        Pin::new(&mut self.get_mut().stream).poll_write(cx, buf)
+    }
+
+    fn poll_flush(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
+        Pin::new(&mut self.get_mut().stream).poll_flush(cx)
+    }
+
+    fn poll_close(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
+        Pin::new(&mut self.get_mut().stream).poll_close(cx)
     }
 }
 
