@@ -1,12 +1,11 @@
 /*
-cargo run -p async-http1-lite-demo-smol --bin client_with_tls httpbin.org 443 /ip
+cargo run -p async-http1-lite-demo-async-net --bin client httpbin.org 80 /ip
 */
 
 use std::env;
 use std::io;
 
 use async_net::TcpStream;
-use async_tls::TlsConnector;
 use futures_lite::future::block_on;
 
 use async_http1_lite::{Http1ClientStream, Request};
@@ -33,9 +32,6 @@ async fn run() -> io::Result<()> {
     //
     let addr = format!("{}:{}", domain, port);
     let stream = TcpStream::connect(addr).await?;
-    let stream = TlsConnector::new()
-        .connect(domain.to_owned(), stream)
-        .await?;
 
     //
     let mut stream = Http1ClientStream::new(stream);

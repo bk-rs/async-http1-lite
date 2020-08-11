@@ -1,5 +1,5 @@
 /*
-cargo run -p async-http1-lite-demo-smol --bin client_with_http_proxy 127.0.0.1 8118 httpbin.org 80 /ip
+cargo run -p async-http1-lite-demo-async-net --bin client_with_http_proxy 127.0.0.1 8118 httpbin.org 80 /ip
 */
 
 use std::env;

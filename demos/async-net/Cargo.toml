@@ -1,5 +1,5 @@
 [package]
-name = "async-http1-lite-demo-smol"
+name = "async-http1-lite-demo-async-net"
 version = "0.1.0"
 authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2018"

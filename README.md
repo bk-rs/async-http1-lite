@@ -4,11 +4,11 @@
 
 ## Examples
 
-### smol 
+### async-net
 
-* [client](demos/smol/src/client.rs)
-* [client_with_http_proxy](demos/smol/src/client_with_http_proxy.rs)
-* [client_with_tls](demos/smol/src/client_with_tls.rs)
+* [client](demos/async-net/src/client.rs)
+* [client_with_http_proxy](demos/async-net/src/client_with_http_proxy.rs)
+* [client_with_tls](demos/async-net/src/client_with_tls.rs)
 
 ## Dev
 
