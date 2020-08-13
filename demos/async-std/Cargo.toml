@@ -9,5 +9,5 @@ name = "client"
 path = "src/client.rs"
 
 [dependencies]
-async-http1-lite = { path = "../..", version = "0.1", features = ["futures_io"] }
+async-http1-lite = { path = "../..", version = "0.2", features = ["futures_io"] }
 async-std = { version = "1.6", default-features = false, features = ["default", "attributes"] }

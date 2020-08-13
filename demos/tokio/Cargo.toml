@@ -9,5 +9,5 @@ name = "client"
 path = "src/client.rs"
 
 [dependencies]
-async-http1-lite = { path = "../..", version = "0.1", features = ["tokio_io"] }
+async-http1-lite = { path = "../..", version = "0.2", features = ["tokio_io"] }
 tokio = { version = "0.2", default-features = false, features = ["io-util", "net", "macros"] }
