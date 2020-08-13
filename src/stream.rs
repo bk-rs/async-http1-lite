@@ -6,7 +6,7 @@ use std::task::{Context, Poll};
 use std::time::Duration;
 
 use async_trait::async_trait;
-use futures_util::io::{AsyncRead, AsyncWrite};
+use futures_x_io::{AsyncRead, AsyncWrite};
 use http::{Request, Response};
 
 use crate::body::{DecoderBody, EncoderBody};
@@ -141,8 +141,14 @@ where
         Pin::new(&mut self.get_mut().stream).poll_flush(cx)
     }
 
+    #[cfg(all(feature = "futures_io", not(feature = "tokio_io")))]
     fn poll_close(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
         Pin::new(&mut self.get_mut().stream).poll_close(cx)
+    }
+
+    #[cfg(all(not(feature = "futures_io"), feature = "tokio_io"))]
+    fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
+        Pin::new(&mut self.get_mut().stream).poll_shutdown(cx)
     }
 }
 
@@ -280,8 +286,14 @@ where
         Pin::new(&mut self.get_mut().stream).poll_flush(cx)
     }
 
+    #[cfg(all(feature = "futures_io", not(feature = "tokio_io")))]
     fn poll_close(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
         Pin::new(&mut self.get_mut().stream).poll_close(cx)
+    }
+
+    #[cfg(all(not(feature = "futures_io"), feature = "tokio_io"))]
+    fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
+        Pin::new(&mut self.get_mut().stream).poll_shutdown(cx)
     }
 }
 
@@ -425,7 +437,13 @@ where
         Pin::new(&mut self.get_mut().stream).poll_flush(cx)
     }
 
+    #[cfg(all(feature = "futures_io", not(feature = "tokio_io")))]
     fn poll_close(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
         Pin::new(&mut self.get_mut().stream).poll_close(cx)
+    }
+
+    #[cfg(all(not(feature = "futures_io"), feature = "tokio_io"))]
+    fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
+        Pin::new(&mut self.get_mut().stream).poll_shutdown(cx)
     }
 }

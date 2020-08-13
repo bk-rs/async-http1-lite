@@ -3,9 +3,9 @@ use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::time::Duration;
 
-use async_stream_packed::AsyncWriteWithTimeoutExt;
 use async_trait::async_trait;
-use futures_util::io::AsyncWrite;
+use futures_x_io::AsyncWrite;
+use futures_x_io_timeoutable::AsyncWriteWithTimeoutExt;
 use http::{
     header::{CONTENT_LENGTH, TRANSFER_ENCODING},
     HeaderMap, HeaderValue, Request, Response, Version,

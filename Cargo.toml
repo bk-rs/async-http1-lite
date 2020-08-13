@@ -12,14 +12,22 @@ keywords = []
 categories = ["asynchronous"]
 readme = "README.md"
 
+[features]
+futures_io = ["futures-x-io/futures_util_io", "futures-x-io-timeoutable/futures_io"]
+tokio_io = ["futures-x-io/tokio_io_util", "futures-x-io-timeoutable/tokio_io"]
+
 [dependencies]
 http = { version = "0.2", default-features = false, features = [] }
-futures-util = { version = "0.3", default-features = false, features = ["io"] }
-async-stream-packed = { version = "0.1", default-features = false, features = ["timeoutable"] }
 async-trait = { version = "0.1", default-features = false, features = [] }
+cfg-if = { version = "0.1", default-features = false, features = [] }
+
+futures-x-io = { version = "0.1", default-features = false, features = [], optional = true }
+futures-x-io-timeoutable = { version = "0.1", default-features = false, features = [], optional = true }
 
 [dev-dependencies]
-futures-lite = { version = "0.1", default-features = false, features = [] }
+futures-lite = { version = "0.1", default-features = false, features = ["std"] }
+
+tokio = { version = "0.2", default-features = false, features = ["io-util"] }
 
 [workspace]
 members = [

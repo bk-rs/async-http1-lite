@@ -3,9 +3,9 @@ use std::io::{self, BufReader};
 use std::ops::{Deref, DerefMut};
 use std::time::Duration;
 
-use async_stream_packed::AsyncReadWithTimeoutExt;
 use async_trait::async_trait;
-use futures_util::io::AsyncRead;
+use futures_x_io::AsyncRead;
+use futures_x_io_timeoutable::AsyncReadWithTimeoutExt;
 use http::{Request, Response, Version};
 
 use crate::body::DecoderBody;
