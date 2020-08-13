@@ -58,6 +58,6 @@ impl BodyFramingDetector for (&HeaderMap<HeaderValue>, &Version) {
             }
         }
 
-        return Ok(BodyFraming::Neither);
+        Ok(BodyFraming::Neither)
     }
 }
