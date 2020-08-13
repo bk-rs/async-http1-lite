@@ -10,6 +10,14 @@
 * [client_with_http_proxy](demos/async-net/src/client_with_http_proxy.rs)
 * [client_with_tls](demos/async-net/src/client_with_tls.rs)
 
+### async-std
+
+* [client](demos/async-std/src/client.rs)
+
+### tokio
+
+* [client](demos/tokio/src/client.rs)
+
 ## Dev
 
 ```
