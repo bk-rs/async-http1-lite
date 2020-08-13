@@ -32,4 +32,6 @@ tokio = { version = "0.2", default-features = false, features = ["io-util"] }
 [workspace]
 members = [
     "demos/async-net",
+    "demos/async-std",
+    "demos/tokio",
 ]

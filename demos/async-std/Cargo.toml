@@ -1,0 +1,13 @@
+[package]
+name = "async-http1-lite-demo-async-std"
+version = "0.1.0"
+authors = ["vkill <vkill.net@gmail.com>"]
+edition = "2018"
+
+[[bin]]
+name = "client"
+path = "src/client.rs"
+
+[dependencies]
+async-http1-lite = { path = "../..", version = "0.1", features = ["futures_io"] }
+async-std = { version = "1.6", default-features = false, features = ["default", "attributes"] }
