@@ -7,9 +7,7 @@ use async_trait::async_trait;
 use futures_x_io::AsyncRead;
 use futures_x_io_timeoutable::AsyncReadWithTimeoutExt;
 use http::{Request, Response, Version};
-
-use crate::body::DecoderBody;
-use crate::message::{
+use http1_spec::{
     body_framing::{BodyFraming, BodyFramingDetector},
     body_parser::{BodyParseOutput, BodyParser},
     content_length_body_parser::ContentLengthBodyParser,
@@ -18,6 +16,8 @@ use crate::message::{
     response_head_parser::ResponseHeadParser,
     ReasonPhrase,
 };
+
+use crate::body::DecoderBody;
 use crate::stream::Http1StreamDecoder;
 
 //

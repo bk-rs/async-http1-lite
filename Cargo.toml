@@ -20,6 +20,7 @@ tokio_io = ["futures-x-io/tokio_io_util", "futures-x-io-timeoutable/tokio_io"]
 http = { version = "0.2", default-features = false, features = [] }
 async-trait = { version = "0.1", default-features = false, features = [] }
 cfg-if = { version = "0.1", default-features = false, features = [] }
+http1-spec = { version = "0.1", default-features = false, features = [] }
 
 futures-x-io = { version = "0.1", default-features = false, features = [], optional = true }
 futures-x-io-timeoutable = { version = "0.1", default-features = false, features = [], optional = true }

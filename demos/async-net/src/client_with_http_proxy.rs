@@ -8,7 +8,7 @@ use std::io;
 use async_net::TcpStream;
 use futures_lite::future::block_on;
 
-use async_http1_lite::{message::http::Version, Http1ClientStream, Request};
+use async_http1_lite::{Http1ClientStream, Request, Version};
 
 fn main() -> io::Result<()> {
     block_on(run())

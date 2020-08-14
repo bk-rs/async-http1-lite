@@ -5,11 +5,9 @@ mod decoder_futures_io_tests {
     use futures_lite::future::block_on;
     use futures_lite::io::Cursor;
     use http::{Method, Version};
+    use http1_spec::body_framing::BodyFraming;
 
-    use async_http1_lite::{
-        decoder::Http1RequestDecoder, message::body_framing::BodyFraming,
-        stream::Http1StreamDecoder,
-    };
+    use async_http1_lite::{decoder::Http1RequestDecoder, stream::Http1StreamDecoder};
 
     #[test]
     fn request_simple() -> io::Result<()> {

@@ -11,15 +11,15 @@ use http::{
     HeaderMap, HeaderValue, Request, Response, Version,
 };
 use http::{request::Parts as RequestParts, response::Parts as ResponseParts};
-
-use crate::body::EncoderBody;
-use crate::message::{
+use http1_spec::{
     body_framing::BodyFraming,
     head_renderer::{Head, HeadRenderer},
     request_head_renderer::RequestHeadRenderer,
     response_head_renderer::ResponseHeadRenderer,
     ReasonPhrase, CHUNKED,
 };
+
+use crate::body::EncoderBody;
 use crate::stream::Http1StreamEncoder;
 
 //

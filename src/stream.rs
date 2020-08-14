@@ -8,11 +8,11 @@ use std::time::Duration;
 use async_trait::async_trait;
 use futures_x_io::{AsyncRead, AsyncWrite};
 use http::{Request, Response};
+use http1_spec::{body_framing::BodyFraming, head_renderer::Head, ReasonPhrase};
 
 use crate::body::{DecoderBody, EncoderBody};
 use crate::decoder::{Http1RequestDecoder, Http1ResponseDecoder};
 use crate::encoder::{Http1RequestEncoder, Http1ResponseEncoder};
-use crate::message::{body_framing::BodyFraming, head_renderer::Head, ReasonPhrase};
 
 //
 //

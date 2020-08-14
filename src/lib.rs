@@ -25,6 +25,5 @@ cfg_if::cfg_if! {
 //
 //
 //
-pub mod message;
-
-pub use http::{Request, Response};
+pub use http;
+pub use http::{Method, Request, Response, StatusCode, Version};

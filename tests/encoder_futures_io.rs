@@ -5,10 +5,10 @@ mod encoder_futures_io_tests {
     use futures_lite::future::block_on;
     use futures_lite::io::Cursor;
     use http::Request;
+    use http1_spec::body_framing::BodyFraming;
 
     use async_http1_lite::{
-        body::EncoderBody, encoder::Http1RequestEncoder, message::body_framing::BodyFraming,
-        stream::Http1StreamEncoder,
+        body::EncoderBody, encoder::Http1RequestEncoder, stream::Http1StreamEncoder,
     };
 
     #[test]
