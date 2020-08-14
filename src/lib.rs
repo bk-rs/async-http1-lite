@@ -25,5 +25,5 @@ cfg_if::cfg_if! {
 //
 //
 //
-pub use http;
 pub use http::{Method, Request, Response, StatusCode, Version};
+pub use http1_spec;
